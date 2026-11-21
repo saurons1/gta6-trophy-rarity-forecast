@@ -43,14 +43,28 @@ reads are collapsed to one state first: Exophase holds the page between
 refreshes, so most reads are duplicates and would otherwise overweight stale
 periods.
 
-## Why the band is wide
+## Why the band is what it is
 
 The spread is the larger fit residual, plus a random-walk term that grows with
-the horizon (`0.5` logit per sqrt day), plus a `0.8` logit floor for Exophase's
+the horizon (`0.3` logit per sqrt day), plus a `0.8` logit floor for Exophase's
 own refresh jumps. The launch-night refresh took the tracked base from 638 to
 3,868 players and every rate but the 100% one down, in one jump; a band that
 cannot cover a jump like that pays far more pinball loss than a wide band
 costs when the answer lands near the median.
+
+The walk term was tightened from 0.5 (submission 1) after checking the live
+page on 2026-11-21: 54,144 players tracked, and every rate had moved
+0.03x–14x in two days — early trophies soared (Chapter 1: 1.25% → 18.02%)
+while late ones collapsed toward 0.01–0.03% as the base grew 85x. On
+synthetic final-like cases built from that live snapshot (2.5-day history
+with step refreshes, 4.5-day horizon, eight scenarios for the target player
+base and earner growth, plus unpredictable future noise), the old spread
+covered 98% of answers against an honest 90% at the final's horizon. The
+tighter walk term brings coverage to 0.95–0.97 and cuts the mean pinball
+loss by about a tenth on the final. The floor stays at 0.8 on purpose: it
+is the only spread that covers a refresh jump at a short horizon — cutting
+it to 0.4 collapsed the practice coverage to zero while gaining only a
+little more on the final, so it was left alone.
 
 Locally, on the practice cases, this scores about half the house baseline's
 loss under a hypothesized refresh answer (the real practice answers are

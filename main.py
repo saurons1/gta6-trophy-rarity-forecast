@@ -18,10 +18,15 @@ Model (see README.md for the full reasoning):
   * The spread is the larger fit residual plus a random-walk term growing
     with the horizon plus a floor for Exophase's own refresh jumps, which
     move every rate at once (the launch-night refresh took the tracked
-    base 638 -> 3,868 and every rate but the 100% one down).  The band is
-    deliberately honest: a narrow band that misses a refresh costs far
-    more pinball loss than a wide band costs when the answer lands near
-    the median.
+    base 638 -> 3,868 and every rate but the 100% one down).  The floor
+    stays at 0.8: it is the only spread that covers a refresh jump at a
+    short horizon, and cutting it collapses the practice coverage.  The
+    random-walk term was tightened 0.5 -> 0.3 (submission 2): on synthetic
+    final-like cases built from the live Exophase page (54,144 tracked on
+    2026-11-21, every rate moved 0.03x-14x in two days) the old spread
+    covered 98% of answers against an honest 90% at the 4.5-day horizon,
+    and the tighter walk term brings coverage to 0.95-0.97 and cuts the
+    mean pinball loss about a tenth, without touching the practice score.
 
 Standard library only, no network, deterministic: the same case always
 writes the same bytes.
@@ -43,7 +48,7 @@ LEVELS = [0.05, 0.25, 0.5, 0.75, 0.95]
 Z = [-1.645, -0.674, 0.0, 0.674, 1.645]
 
 # Tuning constants (see README.md for why each is what it is).
-SIGMA_RW = 0.5          # logit spread per sqrt(day) of horizon (random walk)
+SIGMA_RW = 0.3          # logit spread per sqrt(day) of horizon (random walk)
 SIGMA_FLOOR = 0.8       # logit floor: one Exophase refresh can move every rate
 SIGMA_RESID_FLOOR = 0.25
 DAMP = 0.85             # shrink the extrapolated move toward the last read
